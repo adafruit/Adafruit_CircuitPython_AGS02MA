@@ -123,4 +123,5 @@ class AGS02MA:
                     crc = (crc << 1) ^ _AGS02MA_CRC8_POLYNOMIAL
                 else:
                     crc <<= 1
+            crc &= 0xFF
         return crc & 0xFF
