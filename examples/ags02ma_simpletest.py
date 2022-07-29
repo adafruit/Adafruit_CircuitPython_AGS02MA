@@ -12,11 +12,11 @@ from adafruit_ags02ma import AGS02MA
 # do not go that low...but RP2040, ESP32-S2 does
 i2c = busio.I2C(board.SCL, board.SDA, frequency=20_000)
 
-ags = AGS02MA(i2c, address=0x22)
+ags = AGS02MA(i2c, address=0x1A)
 
 # It is possible to change the I2C address 'semi-permanently' but
 # note that you'll need to restart the script after adjusting the address!
-# ags.set_address(0x22)
+#ags.set_address(0x1A)
 
 while True:
     try:
