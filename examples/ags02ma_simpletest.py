@@ -8,7 +8,8 @@ import board
 import busio
 from adafruit_ags02ma import AGS02MA
 
-# MUST connect I2C at 20KHz!
+# MUST connect I2C at 20KHz! Note some processors, like SAMD21 and SAMD51
+# do not go that low...but RP2040, ESP32-S2 does
 i2c = busio.I2C(board.SCL, board.SDA, frequency=20_000)
 
 ags = AGS02MA(i2c, address=0x22)
