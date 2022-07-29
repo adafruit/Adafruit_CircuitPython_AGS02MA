@@ -15,7 +15,7 @@ ags = AGS02MA(i2c, address=0x22)
 
 # It is possible to change the I2C address 'semi-permanently' but
 # note that you'll need to restart the script after adjusting the address!
-#ags.set_address(0x22)
+# ags.set_address(0x22)
 
 while True:
     try:
@@ -26,4 +26,3 @@ while True:
     except RuntimeError:
         print("Retrying....")
     time.sleep(1)
-

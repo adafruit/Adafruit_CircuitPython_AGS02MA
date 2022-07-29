@@ -32,9 +32,9 @@ Implementation Notes
 """
 
 import time
+import struct
 from micropython import const
 from adafruit_bus_device import i2c_device
-import struct
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_AGS02MA.git"
@@ -47,6 +47,7 @@ _AGS02MA_SETADDR_REG = const(0x21)
 _AGS02MA_CRC8_INIT = const(0xFF)
 _AGS02MA_CRC8_POLYNOMIAL = const(0x31)
 
+
 class AGS02MA:
     """Driver for the AGS02MA air quality sensor
     :param ~busio.I2C i2c_bus: The I2C bus the AGS02MA is connected to.
@@ -54,37 +55,46 @@ class AGS02MA:
     """
 
     def __init__(self, i2c_bus, address=AGS02MA_I2CADDR_DEFAULT):
-        # pylint: disable=no-member
         self.i2c_device = i2c_device.I2CDevice(i2c_bus, address)
 
         self._buf = bytearray(5)
         self._addr = bytearray(1)
         try:
             self.firmware_version()
-        except RuntimeError: # a CRC error or something!
-            raise RuntimeError("Failed to find AGS02MA - check your wiring!")
+        except RuntimeError as exc:  # a CRC error or something!
+            raise RuntimeError("Failed to find AGS02MA - check your wiring!") from exc
 
     def firmware_version(self):
+        """Return 24-bit value which contains the firmware version"""
         return self._read_reg(_AGS02MA_VERSION_REG, 30)
 
     @property
     def gas_resistance(self):
-        return self._read_reg(_AGS02MA_GASRES_REG, 1500) * 100 # in 0.1Kohm
+        """The resistance of the MEMS gas sensor"""
+        return self._read_reg(_AGS02MA_GASRES_REG, 1500) * 100  # in 0.1Kohm
 
     @property
-    def TVOC(self):
+    def TVOC(self):  # pylint: disable=invalid-name
+        """The calculated Total Volatile Organic Compound measurement, in ppb"""
         val = self._read_reg(_AGS02MA_TVOCSTAT_REG, 1500)
         status = val >> 24
-        #print(hex(status))
+        # print(hex(status))
         if status & 0x1:
             raise RuntimeError("Sensor still preheating")
         return val & 0xFFFFFF
 
     def set_address(self, new_addr):
-        _buf = bytearray([_AGS02MA_SETADDR_REG,
-                          new_addr, ~new_addr & 0xFF,
-                          new_addr, ~new_addr & 0xFF,
-                          0])
+        """Set the address for the I2C interface, from 0x0 to 0x7F"""
+        _buf = bytearray(
+            [
+                _AGS02MA_SETADDR_REG,
+                new_addr,
+                ~new_addr & 0xFF,
+                new_addr,
+                ~new_addr & 0xFF,
+                0,
+            ]
+        )
         _buf[5] = self._generate_crc(_buf[1:5])
         with self.i2c_device as i2c:
             i2c.write(_buf)
@@ -95,14 +105,13 @@ class AGS02MA:
             i2c.write(self._addr)
             time.sleep(delayms / 1000)
             i2c.readinto(self._buf)
-        #print([hex(x) for x in self._buf])
+        # print([hex(x) for x in self._buf])
         if self._generate_crc(self._buf) != 0:
             raise RuntimeError("CRC check failed")
-        val, crc = struct.unpack(">IB", self._buf)
-        #print(hex(val), hex(crc))
+        val, crc = struct.unpack(">IB", self._buf)  # pylint: disable=unused-variable
+        # print(hex(val), hex(crc))
         return val
 
-    # pylint: disable=no-self-use
     def _generate_crc(self, data):
         """8-bit CRC algorithm for checking data"""
         crc = _AGS02MA_CRC8_INIT
