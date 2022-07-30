@@ -48,6 +48,21 @@ _AGS02MA_CRC8_INIT = const(0xFF)
 _AGS02MA_CRC8_POLYNOMIAL = const(0x31)
 
 
+def _generate_crc(data):
+    """8-bit CRC algorithm for checking data"""
+    crc = _AGS02MA_CRC8_INIT
+    # calculates 8-Bit checksum with given polynomial
+    for byte in data:
+        crc ^= byte
+        for _ in range(8):
+            if crc & 0x80:
+                crc = (crc << 1) ^ _AGS02MA_CRC8_POLYNOMIAL
+            else:
+                crc <<= 1
+        crc &= 0xFF
+    return crc & 0xFF
+
+
 class AGS02MA:
     """Driver for the AGS02MA air quality sensor
     :param ~busio.I2C i2c_bus: The I2C bus the AGS02MA is connected to.
@@ -95,7 +110,7 @@ class AGS02MA:
                 0,
             ]
         )
-        _buf[5] = self._generate_crc(_buf[1:5])
+        _buf[5] = _generate_crc(_buf[1:5])
         with self.i2c_device as i2c:
             i2c.write(_buf)
 
@@ -106,22 +121,8 @@ class AGS02MA:
             time.sleep(delayms / 1000)
             i2c.readinto(self._buf)
         # print([hex(x) for x in self._buf])
-        if self._generate_crc(self._buf) != 0:
+        if _generate_crc(self._buf) != 0:
             raise RuntimeError("CRC check failed")
         val, crc = struct.unpack(">IB", self._buf)  # pylint: disable=unused-variable
         # print(hex(val), hex(crc))
         return val
-
-    def _generate_crc(self, data):
-        """8-bit CRC algorithm for checking data"""
-        crc = _AGS02MA_CRC8_INIT
-        # calculates 8-Bit checksum with given polynomial
-        for byte in data:
-            crc ^= byte
-            for _ in range(8):
-                if crc & 0x80:
-                    crc = (crc << 1) ^ _AGS02MA_CRC8_POLYNOMIAL
-                else:
-                    crc <<= 1
-            crc &= 0xFF
-        return crc & 0xFF
