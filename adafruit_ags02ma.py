@@ -41,7 +41,11 @@ _AGS02MA_CRC8_POLYNOMIAL = const(0x31)
 
 
 def _generate_crc(data):
-    """8-bit CRC algorithm for checking data"""
+    """8-bit CRC algorithm for checking data
+
+    :param bytearray data: The data to generate a CRC for
+    """
+
     crc = _AGS02MA_CRC8_INIT
     # calculates 8-Bit checksum with given polynomial
     for byte in data:
