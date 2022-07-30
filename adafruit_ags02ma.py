@@ -14,6 +14,10 @@ AGS02MA TVOC / Gas sensor
 Implementation Notes
 --------------------
 
+**Hardware:**
+
+* `AGS02MA Gas Sensor <http://www.adafruit.com/products/5593>`_
+
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
