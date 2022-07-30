@@ -14,21 +14,13 @@ AGS02MA TVOC / Gas sensor
 Implementation Notes
 --------------------
 
-**Hardware:**
-
-.. todo:: Add links to any specific hardware product page(s), or category page(s).
-  Use unordered list & hyperlink rST inline format: "* `Link Text <url>`_"
-
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://circuitpython.org/downloads
 
-.. todo:: Uncomment or remove the Bus Device and/or the Register library dependencies
-  based on the library's use of either.
+* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 
-# * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-# * Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
 import time
@@ -65,8 +57,9 @@ def _generate_crc(data):
 
 class AGS02MA:
     """Driver for the AGS02MA air quality sensor
+
     :param ~busio.I2C i2c_bus: The I2C bus the AGS02MA is connected to.
-    :param address: The I2C device address. Defaults to :const:`0x1A`
+    :param int address: The I2C device address. Defaults to :const:`0x1A`
     """
 
     def __init__(self, i2c_bus, address=AGS02MA_I2CADDR_DEFAULT):
@@ -99,7 +92,11 @@ class AGS02MA:
         return val & 0xFFFFFF
 
     def set_address(self, new_addr):
-        """Set the address for the I2C interface, from 0x0 to 0x7F"""
+        """Set the address for the I2C interface, from 0x0 to 0x7F
+
+        :param int new_addr: THe new address
+        """
+
         _buf = bytearray(
             [
                 _AGS02MA_SETADDR_REG,
@@ -115,6 +112,12 @@ class AGS02MA:
             i2c.write(_buf)
 
     def _read_reg(self, addr, delayms):
+        """Read a register
+
+        :param int addr: The address to read
+        :param int delayms: The delay between writes and reads, in milliseconds
+        """
+
         with self.i2c_device as i2c:
             self._addr[0] = addr
             i2c.write(self._addr)
