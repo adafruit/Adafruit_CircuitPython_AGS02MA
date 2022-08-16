@@ -32,7 +32,7 @@ import struct
 from micropython import const
 from adafruit_bus_device import i2c_device
 
-__version__ = "0.0.0-auto.0"
+__version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_AGS02MA.git"
 
 AGS02MA_I2CADDR_DEFAULT: int = const(0x1A)  # Default I2C address
