@@ -29,7 +29,6 @@ Implementation Notes
 
 try:
     from busio import I2C
-    from typing_extensions import NoReturn
 except ImportError:
     pass
 
@@ -53,7 +52,7 @@ _AGS02MA_CRC8_POLYNOMIAL = const(0x31)
 def _generate_crc(data: int) -> int:
     """8-bit CRC algorithm for checking data
 
-    :param bytearray data: The data to generate a CRC for
+    :param int data: The data to generate a CRC for
     """
 
     crc = _AGS02MA_CRC8_INIT
@@ -73,7 +72,9 @@ class AGS02MA:
     """Driver for the AGS02MA air quality sensor.
 
     .. warning::
-        I2C communication rate cannot be higher than 30KHZ
+        I2C communication rate cannot be higher than 30KHZ. Refer to
+        https://cdn-shop.adafruit.com/product-files/5593/datasheet+ags02ma.pdf
+        Section 3.
 
     :param ~busio.I2C i2c_bus: The I2C bus the AGS02MA is connected to.
     :param int address: The I2C device address. Defaults to :const:`0x1A`
@@ -123,7 +124,7 @@ class AGS02MA:
         return self._read_reg(_AGS02MA_VERSION_REG, 30)
 
     @property
-    def gas_resistance(self) -> float:
+    def gas_resistance(self) -> int:
         """The resistance of the MEMS gas sensor"""
         return self._read_reg(_AGS02MA_GASRES_REG, 1500) * 100  # in 0.1Kohm
 
@@ -140,7 +141,7 @@ class AGS02MA:
             raise RuntimeError("Sensor still preheating")
         return val & 0xFFFFFF
 
-    def set_address(self, new_addr: int) -> NoReturn:
+    def set_address(self, new_addr: int) -> None:
         """Set the address for the I2C interface, from 0x0 to 0x7F
         The sensor supports modifying the I2C address. After sending
         this command, the new address will take effect immediately,
