@@ -83,7 +83,7 @@ following command to install:
 
 .. code-block:: shell
 
-    circup install ags02ma
+    circup install adafruit_ags02ma
 
 Or the following command to update an existing version:
 
