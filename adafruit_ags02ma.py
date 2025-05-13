@@ -32,10 +32,11 @@ try:
 except ImportError:
     pass
 
-import time
 import struct
-from micropython import const
+import time
+
 from adafruit_bus_device import i2c_device
+from micropython import const
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_AGS02MA.git"
@@ -129,7 +130,7 @@ class AGS02MA:
         return self._read_reg(_AGS02MA_GASRES_REG, 1500) * 100  # in 0.1Kohm
 
     @property
-    def TVOC(self) -> int:  # pylint: disable=invalid-name
+    def TVOC(self) -> int:
         """The calculated Total Volatile Organic Compound measurement, in ppb
 
         :raises RunTimeError: When the sensor still preheating
@@ -186,6 +187,6 @@ class AGS02MA:
 
         if _generate_crc(self._buf) != 0:
             raise RuntimeError("CRC check failed")
-        val, crc = struct.unpack(">IB", self._buf)  # pylint: disable=unused-variable
+        val, crc = struct.unpack(">IB", self._buf)  # noqa: F841
 
         return val

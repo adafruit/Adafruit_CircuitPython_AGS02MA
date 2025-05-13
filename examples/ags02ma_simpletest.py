@@ -4,8 +4,10 @@
 # SPDX-License-Identifier: Unlicense
 
 import time
+
 import board
 import busio
+
 from adafruit_ags02ma import AGS02MA
 
 # MUST connect I2C at 20KHz! Note some processors, like SAMD21 and SAMD51
