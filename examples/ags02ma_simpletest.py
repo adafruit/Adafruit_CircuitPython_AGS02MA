@@ -25,7 +25,7 @@ while True:
         res = ags.gas_resistance
         print("Gas resistance: %0.1f Kohms" % (res / 1000))
         tvoc = ags.TVOC
-        print("TVOC: %d ppb" % tvoc)
+        print(f"TVOC: {tvoc:d} ppb")
     except RuntimeError:
         print("Retrying....")
     time.sleep(1)
